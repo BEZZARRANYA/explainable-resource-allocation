@@ -1,0 +1,27 @@
+body {
+  background: #f6f7fb;
+}
+
+.card {
+  border: 0;
+  border-radius: 16px;
+}
+
+.navbar {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.badge-score {
+  font-size: 0.85rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 999px;
+}
+
+.result-item {
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: white;
+}
+

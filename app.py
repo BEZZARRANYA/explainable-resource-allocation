@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Dict, Any, List
 
 from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 
@@ -19,6 +20,9 @@ def get_conn():
     conn.row_factory = sqlite3.Row
     return conn
 
+@app.route("/", methods=["GET"])
+def home():
+    return render_template("dashboard.html")
 
 @app.route("/health", methods=["GET"])
 def health():
