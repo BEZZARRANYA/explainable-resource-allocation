@@ -1,140 +1,280 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>AllocationOS — Explainable Resource Allocation</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AllocationOS — Explainable Decision Support</title>
 
-  <!-- Bootstrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
 
-  <!-- Custom CSS -->
-  <link rel="stylesheet" href="/static/css/styles.css" />
+    <!-- Your CSS (optional, if you already have it) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 
-  <!-- Optional: nicer font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
-</head>
-<body>
+    <style>
+      body { background: #f5f7fb; }
+      .shell { display: grid; grid-template-columns: 320px 1fr; min-height: 100vh; }
+      .sidebar {
+        background: linear-gradient(180deg, #0b2b5b 0%, #103b7a 60%, #0b2b5b 100%);
+        color: #fff;
+        padding: 22px 18px;
+      }
+      .brand {
+        display:flex; align-items:center; gap:12px; margin-bottom:18px;
+      }
+      .badge-circle {
+        width:40px; height:40px; border-radius:12px; background: rgba(255,255,255,.14);
+        display:flex; align-items:center; justify-content:center; font-weight:700;
+      }
+      .side-card {
+        background: rgba(255,255,255,.08);
+        border: 1px solid rgba(255,255,255,.12);
+        border-radius: 16px;
+        padding: 14px;
+        margin-bottom: 14px;
+      }
+      .pill {
+        display:inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.18);
+        font-size: 12px;
+      }
 
-<div class="app-shell">
-  <!-- Sidebar -->
-  <aside class="sidebar">
-    <div class="brand">
-      <div class="brand-mark">AO</div>
-      <div>
-        <div class="brand-title">AllocationOS</div>
-        <div class="brand-sub">Explainable Decision Support</div>
-      </div>
-    </div>
+      .main { padding: 22px; }
+      .topbar {
+        background: #fff; border: 1px solid #e6eaf2; border-radius: 18px;
+        padding: 18px 18px;
+        display:flex; align-items:flex-start; justify-content:space-between; gap:14px;
+        margin-bottom: 18px;
+      }
+      .kpis { display:flex; gap:12px; }
+      .kpi {
+        background:#fff; border:1px solid #e6eaf2; border-radius: 14px;
+        padding: 10px 14px; min-width: 120px;
+      }
+      .kpi .label { font-size:12px; color:#61708c; }
+      .kpi .value { font-size:22px; font-weight:800; color:#0b2b5b; }
 
-    <div class="sidebar-card">
-      <div class="sidebar-label">System</div>
-      <div id="status" class="status-pill">Loading…</div>
-    </div>
+      .grid {
+        display:grid;
+        grid-template-columns: 1.25fr 1fr;
+        gap: 16px;
+        align-items:start;
+      }
+      .panel {
+        background:#fff;
+        border:1px solid #e6eaf2;
+        border-radius:18px;
+        padding: 16px;
+      }
+      .panel-head {
+        display:flex; justify-content:space-between; align-items:flex-start; gap:12px;
+        margin-bottom: 10px;
+      }
+      .panel-title { font-weight:800; font-size:18px; color:#0b2b5b; }
+      .panel-subtitle { color:#61708c; font-size:13px; margin-top:2px; }
 
-    <div class="sidebar-card">
-      <div class="sidebar-label">Scenario</div>
+      .results-wrap { margin-top: 10px; display:flex; flex-direction:column; gap: 10px; }
+      .result-item {
+        border:1px solid #e6eaf2;
+        border-radius: 16px;
+        padding: 12px 12px;
+        background: #fff;
+      }
+      .badge-score {
+        background: #e8f6ee;
+        border: 1px solid #bfe8cf;
+        color: #1b6b3a;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .kv {
+        display:flex; gap:10px; flex-wrap:wrap; margin-top: 8px; color:#33425f; font-size:13px;
+      }
+      .kv > div {
+        background:#f6f8fc; border:1px solid #e6eaf2; border-radius:999px;
+        padding: 6px 10px;
+      }
+      .empty-state {
+        border:1px dashed #d5dbea;
+        background:#fbfcff;
+        border-radius:16px;
+        padding: 18px;
+        color:#61708c;
+      }
+      .empty-title { font-weight:800; color:#0b2b5b; margin-bottom: 4px; }
+      .chart-wrap {
+        border:1px solid #e6eaf2;
+        border-radius: 16px;
+        padding: 12px;
+        background:#fff;
+      }
+      .mini-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+      .mini-card {
+        border:1px solid #e6eaf2; border-radius: 14px; padding: 10px 12px; background:#fff;
+      }
+      .mini-label { font-size:12px; color:#61708c; }
+      .mini-value { font-size:18px; font-weight:800; color:#0b2b5b; margin-top:2px; }
+    </style>
+  </head>
 
-      <label class="form-label mt-2">Task</label>
-      <select id="taskSelect" class="form-select form-select-sm"></select>
-
-      <label class="form-label mt-3">Top K</label>
-      <input id="topK" type="number" class="form-control form-control-sm" value="3" min="1" max="10" />
-
-      <button id="btnRecommend" class="btn btn-brand w-100 mt-3">
-        Run Allocation
-      </button>
-
-      <div class="hint mt-3">
-        Tip: Change tasks to see how the explanation shifts (skills vs workload vs availability).
-      </div>
-    </div>
-
-    <div class="sidebar-footer">
-      <div class="small text-muted">v0.1 • research prototype</div>
-    </div>
-  </aside>
-
-  <!-- Main -->
-  <main class="main">
-    <!-- Hero header -->
-    <header class="hero">
-      <div>
-        <h1 class="hero-title">Smart Resource Allocation</h1>
-        <p class="hero-sub">
-          Transparent recommendations with trade-offs across skill match, workload, and availability.
-        </p>
-      </div>
-
-      <div class="hero-metrics">
-        <div class="metric">
-          <div class="metric-label">Employees</div>
-          <div id="metricEmployees" class="metric-value">—</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Tasks</div>
-          <div id="metricTasks" class="metric-value">—</div>
-        </div>
-        <div class="metric">
-          <div class="metric-label">Avg Workload</div>
-          <div id="metricWorkload" class="metric-value">—</div>
-        </div>
-      </div>
-    </header>
-
-    <div class="content-grid">
-      <!-- Left: recommendations -->
-      <section class="panel">
-        <div class="panel-head">
+  <body>
+    <div class="shell">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="badge-circle">AO</div>
           <div>
-            <div class="panel-title">Recommendations</div>
-            <div id="panelSubtitle" class="panel-subtitle">Pick a task and run allocation.</div>
-          </div>
-          <div class="pill">Explainable Scoring</div>
-        </div>
-
-        <div id="results" class="results-list">
-          <div class="empty-state">
-            <div class="empty-title">No results yet</div>
-            <div class="empty-sub">Run an allocation to see Top-K employees and explanations.</div>
+            <div class="fw-bold">AllocationOS</div>
+            <div class="small opacity-75">Explainable Decision Support</div>
           </div>
         </div>
-      </section>
 
-      <!-- Right: analytics -->
-      <section class="panel">
-        <div class="panel-head">
+        <div class="side-card">
+          <div class="text-uppercase small opacity-75 mb-2">System</div>
+          <span class="pill" id="status">Loading…</span>
+        </div>
+
+        <div class="side-card">
+          <div class="text-uppercase small opacity-75 mb-2">Scenario</div>
+
+          <label class="form-label small mb-1">Task</label>
+          <select id="taskSelect" class="form-select mb-3"></select>
+
+          <label class="form-label small mb-1">Top K</label>
+          <input id="topK" type="number" class="form-control mb-3" value="3" min="1" max="20" />
+
+          <button id="btnRecommend" type="button" class="btn btn-primary w-100">
+            Run Allocation
+          </button>
+
+          <div class="small opacity-75 mt-3">
+            Tip: Change tasks to see how the explanation shifts (skills vs workload vs availability).
+          </div>
+        </div>
+
+        <div class="small opacity-50 mt-4">v0.1 · research prototype</div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main">
+        <div class="topbar">
           <div>
-            <div class="panel-title">Workload Overview</div>
-            <div class="panel-subtitle">Current workload across employees.</div>
+            <div class="h4 fw-bold mb-1">Smart Resource Allocation</div>
+            <div class="text-secondary">
+              Transparent recommendations with trade-offs across skill match, workload, and availability.
+            </div>
           </div>
-          <div class="pill">Chart.js</div>
+
+          <div class="kpis">
+            <div class="kpi">
+              <div class="label">Employees</div>
+              <div class="value" id="metricEmployees">—</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Tasks</div>
+              <div class="value" id="metricTasks">—</div>
+            </div>
+            <div class="kpi">
+              <div class="label">Avg Workload</div>
+              <div class="value" id="metricWorkload">—</div>
+            </div>
+          </div>
         </div>
 
-        <div class="chart-wrap">
-          <canvas id="workloadChart" height="170"></canvas>
-        </div>
+        <div class="grid">
+          <!-- LEFT: RESULTS -->
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-title">Recommendations</div>
+                <div class="panel-subtitle" id="panelSubtitle">Pick a task and run allocation.</div>
+              </div>
+              <span class="pill">Explainable Scoring</span>
+            </div>
 
-        <div class="mini-grid">
-          <div class="mini-card">
-            <div class="mini-label">Highest Workload</div>
-            <div id="maxWorkload" class="mini-value">—</div>
-          </div>
-          <div class="mini-card">
-            <div class="mini-label">Most Available</div>
-            <div id="maxAvailability" class="mini-value">—</div>
-          </div>
+            <div id="results" class="results-wrap">
+              <div class="empty-state">
+                <div class="empty-title">No results yet</div>
+                <div>Run an allocation to see Top-K employees and explanations.</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- RIGHT: WORKLOAD + EXPLAINABILITY -->
+          <section class="panel">
+            <div class="panel-head">
+              <div>
+                <div class="panel-title">Workload Overview</div>
+                <div class="panel-subtitle">Current workload across employees.</div>
+              </div>
+              <span class="pill">Chart.js</span>
+            </div>
+
+            <div class="chart-wrap">
+              <canvas id="workloadChart" height="170"></canvas>
+            </div>
+
+            <div class="mini-grid">
+              <div class="mini-card">
+                <div class="mini-label">Highest Workload</div>
+                <div id="maxWorkload" class="mini-value">—</div>
+              </div>
+              <div class="mini-card">
+                <div class="mini-label">Most Available</div>
+                <div id="maxAvailability" class="mini-value">—</div>
+              </div>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="panel-title">Explainability Visuals</div>
+            <div class="panel-subtitle">
+              Breakdown and skill-fit for the top recommendation.
+            </div>
+
+            <div class="row g-3 mt-2">
+              <div class="col-md-6">
+                <div class="chart-wrap">
+                  <div class="small text-muted mb-2">Score Breakdown</div>
+                  <canvas id="breakdownChart" height="170"></canvas>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="chart-wrap">
+                  <div class="small text-muted mb-2">Skill Fit Radar</div>
+                  <canvas id="radarChart" height="170"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <hr class="my-3">
+
+            <div class="panel-title">Why this employee?</div>
+            <div class="panel-subtitle">
+              Human-readable explanation for the top recommendation.
+            </div>
+
+            <div id="whyPanel" class="result-item mt-2">
+              <div class="text-secondary">Run allocation to see explanation.</div>
+            </div>
+          </section>
         </div>
-      </section>
+      </main>
     </div>
-  </main>
-</div>
 
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="/static/js/app.js"></script>
-</body>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- App JS -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+  </body>
 </html>
 
