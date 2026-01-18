@@ -24,29 +24,28 @@ All explanations are shown visually and in natural language.
 
 ## 🖥️ Dashboard Overview
 
-### Main Dashboard
-The dashboard allows users to select a task and run the allocation algorithm.
-
-![Dashboard Overview](screenshots/dashboard_overview.png)
-
----
+## 🖥️ Dashboard Walkthrough
 
 ### Recommendations Panel
-Employees are ranked by suitability score.
-Each card is **clickable** and updates all explanation panels.
+Employees are ranked by suitability score for the selected task.
+Each recommendation card is **clickable**, allowing users to explore
+alternative candidates and understand trade-offs.
 
-![Recommendations](screenshots/recommendations.png)
+![Recommendations Panel](screenshots/recommendations.png)
+<img width="1440" height="777" alt="recommendations" src="https://github.com/user-attachments/assets/6f64ae54-8f3f-4533-9afe-1c3031e59a33" />
 
 ---
 
 ### Explainability Panels
-When selecting an employee, the system explains the decision using:
+Selecting a recommended employee updates all explanation views in real time:
 
-- **Score Breakdown** (how each factor contributes)
-- **Skill Fit Radar** (employee vs task requirements)
-- **“Why this employee?”** textual explanation
+- **Score Breakdown** — contribution of skill match, workload, and availability  
+- **Skill Fit Radar** — comparison between employee skills and task requirements  
+- **“Why this employee?”** — human-readable explanation supporting trust
 
-![Explainability](screenshots/explainability.png)
+![Explainability Panels](screenshots/explainability.png)
+<img width="1440" height="777" alt="explainability" src="https://github.com/user-attachments/assets/0e4e9f0a-cb19-40f2-91df-ad8a569c0a3b" />
+
 
 ---
 
@@ -67,16 +66,26 @@ This allows users to:
 
 ## 🧱 System Architecture
 
-Web Dashboard (HTML / CSS / JavaScript)
-|
-v
-Flask REST API
-|
-v
-Allocation & Scoring Logic
-|
-v
-SQLite Database
+The system is designed as a modular, end-to-end AI application.
+
+**Flow of data and decisions:**
+
+1. **Web Dashboard (HTML, CSS, JavaScript)**  
+   Users select tasks, explore recommendations, and interact with explanations.
+
+2. **Flask REST API**  
+   Serves tasks, employees, and allocation results via clean endpoints.
+
+3. **Allocation & Scoring Logic**  
+   Computes suitability scores using skill match, workload, and availability,
+   while preserving explainable component contributions.
+
+4. **SQLite Database**  
+   Stores tasks, employees, workloads, and historical data.
+
+This architecture separates concerns between presentation, logic, and data,
+making the system extensible and research-friendly.
+
 This is a **full end-to-end AI system**, not just a script or notebook.
 
 ---
