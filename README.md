@@ -31,7 +31,7 @@ Employees are ranked by suitability score for the selected task.
 Each recommendation card is **clickable**, allowing users to explore
 alternative candidates and understand trade-offs.
 
-![Recommendations Panel](screenshots/recommendations.png)
+
 <img width="1440" height="777" alt="recommendations" src="https://github.com/user-attachments/assets/6f64ae54-8f3f-4533-9afe-1c3031e59a33" />
 
 ---
@@ -43,7 +43,6 @@ Selecting a recommended employee updates all explanation views in real time:
 - **Skill Fit Radar** — comparison between employee skills and task requirements  
 - **“Why this employee?”** — human-readable explanation supporting trust
 
-![Explainability Panels](screenshots/explainability.png)
 <img width="1440" height="777" alt="explainability" src="https://github.com/user-attachments/assets/0e4e9f0a-cb19-40f2-91df-ad8a569c0a3b" />
 
 
