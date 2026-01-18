@@ -3,68 +3,137 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Explainable Resource Allocation</title>
+  <title>AllocationOS — Explainable Resource Allocation</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Custom CSS -->
   <link rel="stylesheet" href="/static/css/styles.css" />
+
+  <!-- Optional: nicer font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-<body>
-<nav class="navbar navbar-expand-lg bg-dark navbar-dark">
-  <div class="container">
-    <a class="navbar-brand" href="/">Explainable Allocation</a>
-    <span class="navbar-text small">Decision Support Dashboard</span>
-  </div>
-</nav>
+<body class="app-bg">
 
-<main class="container my-4">
-  <div class="row g-3">
-    <div class="col-lg-4">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">Pick a Task</h5>
-          <select id="taskSelect" class="form-select mb-3"></select>
-
-          <label class="form-label">Top K</label>
-          <input id="topK" type="number" class="form-control mb-3" value="3" min="1" max="10" />
-
-          <button id="btnRecommend" class="btn btn-primary w-100">Recommend</button>
-        </div>
-      </div>
-
-      <div class="card shadow-sm mt-3">
-        <div class="card-body">
-          <h6 class="card-title">System Status</h6>
-          <div id="status" class="text-muted small">Loading…</div>
-        </div>
+<div class="app-shell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">AO</div>
+      <div>
+        <div class="brand-title">AllocationOS</div>
+        <div class="brand-sub">Explainable Decision Support</div>
       </div>
     </div>
 
-    <div class="col-lg-8">
-      <div class="card shadow-sm">
-        <div class="card-body">
-          <h5 class="card-title">Top Recommendations</h5>
-          <div id="results" class="mt-3">
-            <div class="text-muted">Select a task and click Recommend.</div>
+    <div class="sidebar-card">
+      <div class="sidebar-label">System</div>
+      <div id="status" class="status-pill">Loading…</div>
+    </div>
+
+    <div class="sidebar-card">
+      <div class="sidebar-label">Scenario</div>
+
+      <label class="form-label mt-2">Task</label>
+      <select id="taskSelect" class="form-select form-select-sm"></select>
+
+      <label class="form-label mt-3">Top K</label>
+      <input id="topK" type="number" class="form-control form-control-sm" value="3" min="1" max="10" />
+
+      <button id="btnRecommend" class="btn btn-brand w-100 mt-3">
+        Run Allocation
+      </button>
+
+      <div class="hint mt-3">
+        Tip: Change tasks to see how the explanation shifts (skills vs workload vs availability).
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="small text-muted">v0.1 • research prototype</div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Hero header -->
+    <header class="hero">
+      <div>
+        <h1 class="hero-title">Smart Resource Allocation</h1>
+        <p class="hero-sub">
+          Transparent recommendations with trade-offs across skill match, workload, and availability.
+        </p>
+      </div>
+
+      <div class="hero-metrics">
+        <div class="metric">
+          <div class="metric-label">Employees</div>
+          <div id="metricEmployees" class="metric-value">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Tasks</div>
+          <div id="metricTasks" class="metric-value">—</div>
+        </div>
+        <div class="metric">
+          <div class="metric-label">Avg Workload</div>
+          <div id="metricWorkload" class="metric-value">—</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content-grid">
+      <!-- Left: recommendations -->
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Recommendations</div>
+            <div id="panelSubtitle" class="panel-subtitle">Pick a task and run allocation.</div>
+          </div>
+          <div class="pill">Explainable Scoring</div>
+        </div>
+
+        <div id="results" class="results-list">
+          <div class="empty-state">
+            <div class="empty-title">No results yet</div>
+            <div class="empty-sub">Run an allocation to see Top-K employees and explanations.</div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div class="card shadow-sm mt-3">
-        <div class="card-body">
-          <h5 class="card-title">Workload Distribution</h5>
-          <canvas id="workloadChart" height="120"></canvas>
+      <!-- Right: analytics -->
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Workload Overview</div>
+            <div class="panel-subtitle">Current workload across employees.</div>
+          </div>
+          <div class="pill">Chart.js</div>
         </div>
-      </div>
+
+        <div class="chart-wrap">
+          <canvas id="workloadChart" height="170"></canvas>
+        </div>
+
+        <div class="mini-grid">
+          <div class="mini-card">
+            <div class="mini-label">Highest Workload</div>
+            <div id="maxWorkload" class="mini-value">—</div>
+          </div>
+          <div class="mini-card">
+            <div class="mini-label">Most Available</div>
+            <div id="maxAvailability" class="mini-value">—</div>
+          </div>
+        </div>
+      </section>
     </div>
-  </div>
-</main>
+  </main>
+</div>
 
 <!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- App JS -->
 <script src="/static/js/app.js"></script>
 </body>
 </html>

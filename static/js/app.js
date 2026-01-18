@@ -14,6 +14,9 @@ function renderResults(payload) {
   const results = document.getElementById("results");
   results.innerHTML = "";
 
+  document.getElementById("panelSubtitle").textContent =
+    `Task: ${payload.task.title} • Showing Top-${payload.top_k.length}`;
+
   payload.top_k.forEach((item, idx) => {
     const emp = item.employee;
     const score = item.score;
@@ -22,19 +25,21 @@ function renderResults(payload) {
     div.className = "result-item";
 
     div.innerHTML = `
-      <div class="d-flex justify-content-between align-items-center">
+      <div class="d-flex justify-content-between align-items-start gap-2">
         <div>
-          <strong>#${idx + 1} ${emp.name}</strong>
+          <div class="fw-bold">#${idx + 1} ${emp.name}</div>
           <div class="text-muted small">${emp.role}</div>
         </div>
-        <span class="badge bg-success badge-score">Score: ${score.toFixed(3)}</span>
+        <span class="badge-score">Score: ${score.toFixed(3)}</span>
       </div>
-      <div class="mt-2 small">
-        <div><b>Skill Match:</b> ${item.explanation.skill_match}</div>
-        <div><b>Workload Score:</b> ${item.explanation.workload_score}</div>
-        <div><b>Availability Score:</b> ${item.explanation.availability_score}</div>
+
+      <div class="kv">
+        <div>Skill match: <b>${item.explanation.skill_match}</b></div>
+        <div>Workload: <b>${item.explanation.workload_score}</b></div>
+        <div>Availability: <b>${item.explanation.availability_score}</b></div>
       </div>
     `;
+
     results.appendChild(div);
   });
 }
@@ -72,9 +77,21 @@ async function init() {
       .map(t => `<option value="${t.task_id}">#${t.task_id} — ${t.title}</option>`)
       .join("");
 
-    const employees = await fetchJSON("/employees");
-    renderWorkload(employees);
+const employees = await fetchJSON("/employees");
+renderWorkload(employees);
 
+document.getElementById("metricEmployees").textContent = employees.length;
+
+const avgWork = Math.round(employees.reduce((s,e)=>s+e.current_workload,0)/employees.length);
+document.getElementById("metricWorkload").textContent = `${avgWork}%`;
+
+const maxW = employees.reduce((a,b)=>a.current_workload>b.current_workload?a:b);
+document.getElementById("maxWorkload").textContent = `${maxW.name} (${maxW.current_workload}%)`;
+
+const maxA = employees.reduce((a,b)=>a.availability>b.availability?a:b);
+document.getElementById("maxAvailability").textContent = `${maxA.name} (${maxA.availability}%)`;
+
+    document.getElementById("metricTasks").textContent = tasks.length;
     document.getElementById("btnRecommend").addEventListener("click", async () => {
       const taskId = select.value;
       const k = document.getElementById("topK").value || 3;
