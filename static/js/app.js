@@ -4,6 +4,16 @@ let workloadChart = null;
 let breakdownChart = null;
 let radarChart = null;
 
+function setStatus(msg) {
+  const el = document.getElementById("status");
+  if (el) el.textContent = msg;
+}
+
+function fmtPct01(x) {
+  const v = Math.max(0, Math.min(1, Number(x) || 0));
+  return `${Math.round(v * 100)}%`;
+}
+
 async function tryFetchJSON(urls) {
   let lastErr = null;
   for (const url of urls) {
@@ -18,13 +28,7 @@ async function tryFetchJSON(urls) {
   throw lastErr || new Error("All fetch attempts failed");
 }
 
-function setStatus(msg) {
-  const el = document.getElementById("status");
-  if (el) el.textContent = msg;
-}
-
 function normalizeTask(t) {
-  // supports {task_id, title} OR {id, name}
   return {
     id: t.task_id ?? t.id,
     title: t.title ?? t.name ?? t.task_title ?? "Untitled Task",
@@ -33,17 +37,16 @@ function normalizeTask(t) {
 }
 
 function normalizeEmployee(e) {
-  // supports multiple shapes
   return {
+    id: e.employee_id ?? e.id,
     name: e.name ?? e.employee_name ?? "Unknown",
     role: e.role ?? e.job ?? "",
-    current_workload: e.current_workload ?? e.workload ?? 0,
-    availability: e.availability ?? (e.availability_score ?? 0),
-    // for radar (default 0 if missing)
-    skill_python: e.skill_python ?? 0,
-    skill_ml: e.skill_ml ?? 0,
-    skill_backend: e.skill_backend ?? 0,
-    skill_frontend: e.skill_frontend ?? 0,
+    current_workload: Number(e.current_workload ?? e.workload ?? 0),
+    availability: Number(e.availability ?? e.availability_score ?? 0),
+    skill_python: Number(e.skill_python ?? 0),
+    skill_ml: Number(e.skill_ml ?? 0),
+    skill_backend: Number(e.skill_backend ?? 0),
+    skill_frontend: Number(e.skill_frontend ?? 0),
     raw: e
   };
 }
@@ -66,14 +69,14 @@ function updateMetrics(employees, tasks) {
 function updateMiniCards(employees) {
   if (!employees.length) return;
 
-  const maxW = employees.reduce((a, b) => a.current_workload > b.current_workload ? a : b);
-  const maxA = employees.reduce((a, b) => a.availability > b.availability ? a : b);
+  const maxW = employees.reduce((a, b) => (a.current_workload > b.current_workload ? a : b));
+  const maxA = employees.reduce((a, b) => (a.availability > b.availability ? a : b));
 
   const elMaxW = document.getElementById("maxWorkload");
   const elMaxA = document.getElementById("maxAvailability");
 
   if (elMaxW) elMaxW.textContent = `${maxW.name} (${maxW.current_workload}%)`;
-  if (elMaxA) elMaxA.textContent = `${maxA.name} (${Math.round(maxA.availability * 100)}%)`;
+  if (elMaxA) elMaxA.textContent = `${maxA.name} (${fmtPct01(maxA.availability)})`;
 }
 
 function renderWorkload(employees) {
@@ -104,10 +107,12 @@ function renderBreakdown(expl) {
     type: "bar",
     data: {
       labels: ["Skill match", "Workload", "Availability"],
-      datasets: [{
-        label: "Component score (0–1)",
-        data: [expl.skill_match, expl.workload_score, expl.availability_score]
-      }]
+      datasets: [
+        {
+          label: "Component score (0–1)",
+          data: [expl.skill_match, expl.workload_score, expl.availability_score]
+        }
+      ]
     },
     options: { responsive: true, scales: { y: { beginAtZero: true, max: 1 } } }
   });
@@ -120,12 +125,11 @@ function renderRadar(employee, task) {
   const ctx = canvas.getContext("2d");
   if (radarChart) radarChart.destroy();
 
-  // task fields may vary; default 0
   const req = {
-    required_python: task.required_python ?? 0,
-    required_ml: task.required_ml ?? 0,
-    required_backend: task.required_backend ?? 0,
-    required_frontend: task.required_frontend ?? 0,
+    required_python: Number(task.required_python ?? 0),
+    required_ml: Number(task.required_ml ?? 0),
+    required_backend: Number(task.required_backend ?? 0),
+    required_frontend: Number(task.required_frontend ?? 0)
   };
 
   radarChart = new Chart(ctx, {
@@ -134,11 +138,11 @@ function renderRadar(employee, task) {
       labels: ["Python", "ML", "Backend", "Frontend"],
       datasets: [
         {
-          label: "Employee (0–5)",
+          label: "Employee skills (0–5)",
           data: [employee.skill_python, employee.skill_ml, employee.skill_backend, employee.skill_frontend]
         },
         {
-          label: "Task (0–5)",
+          label: "Task requirements (0–5)",
           data: [req.required_python, req.required_ml, req.required_backend, req.required_frontend]
         }
       ]
@@ -147,21 +151,27 @@ function renderRadar(employee, task) {
   });
 }
 
-function renderWhy(top) {
+function renderWhy(item, employee) {
   const panel = document.getElementById("whyPanel");
   if (!panel) return;
 
-  const emp = top.employee;
-  const expl = top.explanation;
+  const expl = item.explanation;
 
   panel.innerHTML = `
-    <div class="fw-bold mb-1">Why ${emp.name}?</div>
-    <ul class="mb-0">
-      <li>Skill match contribution: <b>${expl.skill_match}</b></li>
-      <li>Workload contribution: <b>${expl.workload_score}</b> (workload ${emp.current_workload}%)</li>
-      <li>Availability contribution: <b>${expl.availability_score}</b> (availability ${Math.round(emp.availability * 100)}%)</li>
+    <div class="why-title">Why ${employee.name}?</div>
+    <ul class="why-list">
+      <li><b>Skill match</b> contribution: <b>${expl.skill_match}</b></li>
+      <li><b>Workload</b> contribution: <b>${expl.workload_score}</b> (workload ${employee.current_workload}%)</li>
+      <li><b>Availability</b> contribution: <b>${expl.availability_score}</b> (availability ${fmtPct01(employee.availability)})</li>
     </ul>
+    <div class="why-foot">Tip: Click other employees to compare trade-offs.</div>
   `;
+}
+
+function setSelectedCard(index) {
+  document.querySelectorAll(".result-item").forEach((el, i) => {
+    el.classList.toggle("selected", i === index);
+  });
 }
 
 function renderResults(payload) {
@@ -181,10 +191,24 @@ function renderResults(payload) {
     return;
   }
 
+  const taskObj = payload.task || {};
+
+  function applySelection(idx) {
+    setSelectedCard(idx);
+
+    const item = topk[idx];
+    const emp = normalizeEmployee(item.employee);
+
+    renderBreakdown(item.explanation);
+    renderRadar(emp, taskObj);
+    renderWhy(item, emp);
+  }
+
   topk.forEach((item, idx) => {
     const emp = normalizeEmployee(item.employee);
     const div = document.createElement("div");
-    div.className = "result-item";
+    div.className = "result-item clickable";
+
     div.innerHTML = `
       <div class="d-flex justify-content-between align-items-start gap-2">
         <div>
@@ -193,26 +217,22 @@ function renderResults(payload) {
         </div>
         <span class="badge-score">Score: ${Number(item.score).toFixed(3)}</span>
       </div>
-      <div class="kv">
+
+      <div class="kv mt-2">
         <div>Skill: <b>${item.explanation.skill_match}</b></div>
         <div>Workload: <b>${item.explanation.workload_score}</b></div>
         <div>Availability: <b>${item.explanation.availability_score}</b></div>
       </div>
+
+      <div class="small text-muted mt-2">Click to inspect explanation</div>
     `;
+
+    div.addEventListener("click", () => applySelection(idx));
     results.appendChild(div);
   });
 
-  const top = topk[0];
-  const topEmp = normalizeEmployee(top.employee);
-
-  // draw explainability
-  renderBreakdown(top.explanation);
-
-  // if backend returns task in payload, use it; otherwise read selected task text only
-  const task = payload.task || {};
-  renderRadar(topEmp, task);
-
-  renderWhy({ employee: topEmp, explanation: top.explanation });
+  // default select the top result
+  applySelection(0);
 }
 
 async function init() {
@@ -227,13 +247,13 @@ async function init() {
       setStatus("ok");
     }
 
-    // tasks + employees (try multiple routes)
     const rawTasks = await tryFetchJSON(["/tasks", "/api/tasks"]);
     const rawEmployees = await tryFetchJSON(["/employees", "/api/employees"]);
 
     const tasks = (rawTasks || []).map(normalizeTask);
     const employees = (rawEmployees || []).map(normalizeEmployee);
 
+    // fill dropdown
     const select = document.getElementById("taskSelect");
     if (select) {
       select.innerHTML = tasks
@@ -244,7 +264,6 @@ async function init() {
     updateMetrics(employees, tasks);
     updateMiniCards(employees);
     renderWorkload(employees);
-
   } catch (err) {
     console.error(err);
     setStatus(`Error: ${err.message}`);
@@ -254,7 +273,7 @@ async function init() {
 async function runRecommend() {
   try {
     const taskId = document.getElementById("taskSelect")?.value;
-    const k = Number(document.getElementById("topK")?.value || 3);
+    const k = Number(document.getElementById("topK")?.value || 5);
 
     if (!taskId) {
       setStatus("No task loaded (tasks fetch failed).");
@@ -263,7 +282,6 @@ async function runRecommend() {
 
     setStatus("Running allocation…");
 
-    // try multiple recommend endpoints
     const payload = await tryFetchJSON([
       `/recommend?task_id=${taskId}&k=${k}`,
       `/api/recommend?task_id=${taskId}&k=${k}`
@@ -279,6 +297,7 @@ async function runRecommend() {
 
 document.addEventListener("DOMContentLoaded", () => {
   init();
+
   const btn = document.getElementById("btnRecommend");
   if (btn) btn.addEventListener("click", runRecommend);
 });
