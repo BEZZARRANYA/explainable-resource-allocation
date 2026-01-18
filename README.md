@@ -5,7 +5,6 @@ to tasks while clearly explaining *why* each recommendation is made.
 
 This project focuses on **explainable decision support**, not black-box automation.
 
----
 
 ## 🔍 What Does This System Do?
 
@@ -20,7 +19,6 @@ The system:
 
 All explanations are shown visually and in natural language.
 
----
 
 ## 🖥️ Dashboard Overview
 
@@ -34,7 +32,6 @@ alternative candidates and understand trade-offs.
 
 <img width="1440" height="777" alt="recommendations" src="https://github.com/user-attachments/assets/6f64ae54-8f3f-4533-9afe-1c3031e59a33" />
 
----
 
 ### Explainability Panels
 Selecting a recommended employee updates all explanation views in real time:
@@ -46,7 +43,6 @@ Selecting a recommended employee updates all explanation views in real time:
 <img width="1440" height="777" alt="explainability" src="https://github.com/user-attachments/assets/0e4e9f0a-cb19-40f2-91df-ad8a569c0a3b" />
 
 
----
 
 ## 🧠 Why This Is Explainable AI
 
@@ -61,7 +57,6 @@ This allows users to:
 - Compare alternatives
 - Make informed final decisions
 
----
 
 ## 🧱 System Architecture
 
@@ -87,7 +82,7 @@ making the system extensible and research-friendly.
 
 This is a **full end-to-end AI system**, not just a script or notebook.
 
----
+
 
 ## 🛠️ Tech Stack
 
@@ -104,7 +99,7 @@ This is a **full end-to-end AI system**, not just a script or notebook.
 **Database**
 - SQLite
 
----
+
 
 ## 🚀 How to Run the Project
 
