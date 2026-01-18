@@ -68,7 +68,9 @@ async function init() {
 
     const tasks = await fetchJSON("/tasks");
     const select = document.getElementById("taskSelect");
-    select.innerHTML = tasks.map(t => `<option value="${t.task_id}">#${t.task_id} — ${t.title}</option>`).join("");
+    select.innerHTML = tasks
+      .map(t => `<option value="${t.task_id}">#${t.task_id} — ${t.title}</option>`)
+      .join("");
 
     const employees = await fetchJSON("/employees");
     renderWorkload(employees);
