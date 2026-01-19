@@ -1,3 +1,4 @@
+
 # Explainable AI Resource Allocation Dashboard
 
 An interactive AI-powered dashboard that helps organizations allocate employees
@@ -30,8 +31,7 @@ Employees are ranked by suitability score for the selected task.
 Each recommendation card is **clickable**, allowing users to explore
 alternative candidates and understand trade-offs.
 
-![Recommendations Panel](screenshots/recommendations.png)
-
+![Recommendations](screenshots/recommendations.png)
 ---
 
 ### Explainability Panels
@@ -41,8 +41,7 @@ Selecting a recommended employee updates all explanation views in real time:
 - **Skill Fit Radar** — comparison between employee skills and task requirements  
 - **“Why this employee?”** — human-readable explanation supporting trust  
 
-![Explainability Panels](screenshots/explainability.png)
-
+![Explainability](screenshots/explainability.png)
 ---
 
 ## 🧠 Why This Is Explainable AI
