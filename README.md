@@ -29,8 +29,7 @@ All explanations are shown **visually** and in **natural language**.
 Employees are ranked by suitability score for the selected task.  
 Each recommendation card is **clickable** and updates the explanation panels to help you compare trade-offs.
 
-![Recommendations](screenshots/recommendations.png)
-
+![Recommendations](screenshots/recommendations_v2.png)
 ---
 
 ### Explainability Panels
@@ -40,8 +39,7 @@ Selecting a recommended employee updates all explanation views in real time:
 - **Skill Fit Radar** — employee skills vs task requirements  
 - **Why this employee?** — human-readable explanation supporting trust  
 
-![Explainability](screenshots/explainability.png)
-
+![Explainability](screenshots/explainability_v2.png)
 
 ---
 
