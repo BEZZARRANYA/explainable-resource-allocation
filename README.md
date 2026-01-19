@@ -90,24 +90,37 @@ This allows users to:
 ---
 
 ## System Architecture
-The project follows a modular architecture:
 
-- `data/` – Synthetic datasets (resources, tasks, historical assignments)  
-- `src/` – Core recommendation logic and evaluation scripts  
-- `evaluation/` – Performance analysis using Precision@K and Recall@K  
+The project follows a modular and extensible architecture:
 
-This design supports easy extension toward more advanced machine learning models.
+- `data/` – Synthetic datasets for tasks, resources, and historical assignments  
+- `db/` – SQLite schema, seed data, and database initialization scripts  
+- `scripts/` – Supporting scripts for setup and experimentation  
+- `static/` – Frontend assets (CSS, JavaScript)  
+- `templates/` – HTML templates for the web-based dashboard  
+- `screenshots/` – UI and explainability visualizations used in documentation  
+- `app.py` – Flask application entry point and API routing logic  
+
+The recommendation logic and evaluation routines are integrated within the application layer, ensuring transparency and traceability between data, scoring, and explanations.
 
 ---
 
 ## Evaluation
-The recommendation system is evaluated using **synthetic historical assignment data**, treating successful task completions as relevant outcomes.
 
-**Metrics used:**
-- Precision@K  
-- Recall@K  
+The recommendation logic is designed to support future quantitative evaluation.
+At this stage, the system focuses on **explainable decision support**, with performance
+assessed through controlled synthetic scenarios.
 
-Comparisons are performed against simple baselines (e.g., lowest workload selection), demonstrating the effectiveness of the hybrid explainable approach.
+Candidate evaluation metrics include:
+- Precision@K
+- Recall@K
+
+These metrics are commonly used in recommendation systems to assess ranking quality.
+They can be applied by treating successful task–resource assignments as relevant outcomes
+in historical or simulated data.
+
+This design allows the system to be easily extended with formal benchmarking
+against baseline strategies such as workload-based or random assignment.
 
 ---
 
