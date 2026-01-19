@@ -23,25 +23,26 @@ The system:
 All explanations are shown **visually** and in **natural language**.
 
 ---
-
 ## 🖥️ Dashboard Walkthrough
 
 ### Recommendations Panel
-Employees are ranked by suitability score for the selected task.
-Each recommendation card is **clickable**, allowing users to explore
-alternative candidates and understand trade-offs.
+Employees are ranked by suitability score for the selected task.  
+Each recommendation card is **clickable** and updates the explanation panels to help you compare trade-offs.
 
 ![Recommendations](screenshots/recommendations.png)
+
 ---
 
 ### Explainability Panels
 Selecting a recommended employee updates all explanation views in real time:
 
 - **Score Breakdown** — contribution of skill match, workload, and availability  
-- **Skill Fit Radar** — comparison between employee skills and task requirements  
-- **“Why this employee?”** — human-readable explanation supporting trust  
+- **Skill Fit Radar** — employee skills vs task requirements  
+- **Why this employee?** — human-readable explanation supporting trust  
 
 ![Explainability](screenshots/explainability.png)
+
+
 ---
 
 ## 🧠 Why This Is Explainable AI
